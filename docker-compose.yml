@@ -8,6 +8,10 @@ services:
         VARIANT: ubuntu-20.04
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - .:/workspace:cached
+    working_dir: /workspace
+    command: /bin/sh -c "while sleep 1000; do :; done"
   irc-server:
     image: inspircd/inspircd-docker
     ports:
