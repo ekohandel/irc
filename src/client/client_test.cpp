@@ -3,7 +3,7 @@
 
 TEST(ClientTest, ShouldParseCommandWhenGivenMessageWithoutPrefixAndParameters)
 {
-    Client client("localhost", "6667");
+    Client client("irc-server", "6667");
 
     client.Connect();
 }
