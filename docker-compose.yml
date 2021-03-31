@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  irc:
+    image: irc
+    build:
+      args:
+        VARIANT: ubuntu-20.04
+      context: .
+      dockerfile: ./Dockerfile
+  irc-server:
+    image: inspircd/inspircd-docker
+    ports:
+      - "6667:6667"
