@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "message.h"
+#include "messages.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -12,11 +13,11 @@ class MessageTest: public ::testing::Test
 
         void SetUp() override {
             (handler = new template_builder<pass>())
-                ->set_next(new template_builder<nick>())
-                ->set_next(new template_builder<user>())
-                ->set_next(new template_builder<ping>())
-                ->set_next(new template_builder<pong>())
-                ->set_next(new template_builder<notice>())
+                ->add_builder(new template_builder<nick>())
+                ->add_builder(new template_builder<user>())
+                ->add_builder(new template_builder<ping>())
+                ->add_builder(new template_builder<pong>())
+                ->add_builder(new template_builder<notice>())
             ;
         }
 

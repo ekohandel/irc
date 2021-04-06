@@ -3,8 +3,11 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <deque>
+#include <iostream>
 
 #include "message.h"
+#include "messages.h"
+#include "handler.h"
 
 using std::deque;
 using std::string;
@@ -27,7 +30,8 @@ class Client
         deque<string> write_messages;
         boost::asio::streambuf read_buffer;
         const char *message_delimiter = "\r\n";
-        builder *handler;
+        builder *message_builder = nullptr;
+        handler *message_handler = nullptr;
 
         void start_runner() {
             runner = std::make_unique<std::thread>(
@@ -35,14 +39,6 @@ class Client
                     executer.run();
                 }
             );
-        }
-
-        void send_message(unique_ptr<message> &msg) {
-            auto text = msg->serialize().append(message_delimiter);
-            auto initiate_write = write_messages.empty();
-            write_messages.push_back(text);
-            if (initiate_write)
-                do_write();
         }
 
         void do_read() {
@@ -59,16 +55,8 @@ class Client
                         do_read();
 
                         try {
-                            unique_ptr<message> msg = handler->build(string{text.begin(), text.end() - strlen(message_delimiter)});
-
-                            // HACK: just respond to ping for now
-                            // need to restructure messages and allow for defining
-                            // handlers for message types
-                            ping *ping_msg = dynamic_cast<ping*>(msg.get());
-                            if (ping_msg) {
-                                unique_ptr<message> pong_msg = make_unique<pong>(ping_msg->servers);
-                                send_message(pong_msg);
-                            }
+                            unique_ptr<message> msg = message_builder->build(string{text.begin(), text.end() - strlen(message_delimiter)});
+                            message_handler->handle(msg.get(), *this);
                         } catch (std::invalid_argument e) {
                             std::cerr << e.what() << std::endl;
                         }
@@ -96,23 +84,38 @@ class Client
         }
 
     public:
-        Client(string host, string service) : host(host), service(service) {
-            (handler = new template_builder<pass>())
-                ->set_next(new template_builder<nick>())
-                ->set_next(new template_builder<user>())
-                ->set_next(new template_builder<ping>())
-                ->set_next(new template_builder<pong>())
-                ->set_next(new template_builder<notice>())
-            ;
-        }
+        Client(string host, string service) : host(host), service(service) {}
 
         ~Client() {
-            delete handler;
+            delete message_builder;
+            delete message_handler;
             if (runner)
                 runner->join();
         }
 
-        void connect_as(string user_name, string real_name) {
+        handler *add_handler(handler *delegate) {
+            if (message_handler)
+                return message_handler->add_handler(delegate);
+            message_handler = delegate;
+            return message_handler;
+        }
+
+        builder *add_builder(builder *delegate) {
+            if (message_builder)
+                return message_builder->add_builder(delegate);
+            message_builder = delegate;
+            return message_builder;
+        }
+
+        void send_message(unique_ptr<message> &msg) {
+            auto text = msg->serialize().append(message_delimiter);
+            auto initiate_write = write_messages.empty();
+            write_messages.push_back(text);
+            if (initiate_write)
+                do_write();
+        }
+
+        void connect(string user_name, string real_name) {
             user_name = user_name;
             real_name = real_name;
 
@@ -132,7 +135,7 @@ class Client
                         send_message(msg);
                         msg = make_unique<nick>(user_name);
                         send_message(msg);
-                        msg = make_unique<nick>(real_name);
+                        msg = make_unique<user>(user_name, real_name);
                         send_message(msg);
                     }
                 }
