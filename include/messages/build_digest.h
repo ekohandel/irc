@@ -11,6 +11,7 @@ class build_digest {
 		string prefix;
 		string command;
 		vector<string> params;
+		string text;
 
 		build_digest(string text);
 };

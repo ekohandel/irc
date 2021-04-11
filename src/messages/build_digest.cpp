@@ -8,6 +8,7 @@ using std::string;
 using std::vector;
 
 build_digest::build_digest(string text)
+	: text(text)
 {
 	size_t position = 0;
 

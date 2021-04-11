@@ -33,7 +33,7 @@ TEST_F(MessageTest, UnsupportedMessageFails)
     try {
         handler->build(text);
     } catch (std::invalid_argument e) {
-        EXPECT_EQ(e.what(), string{"Unsupported message type: FOO"});
+        EXPECT_EQ(e.what(), "Unsupported message: " + text);
         thrown = true;
     }
     EXPECT_TRUE(thrown);
