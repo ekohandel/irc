@@ -9,10 +9,6 @@ abstract_message::abstract_message(string prefix="")
 {
 }
 
-abstract_message::~abstract_message()
-{
-}
-
 string abstract_message::serialize() const
 {
     if (!prefix.empty())

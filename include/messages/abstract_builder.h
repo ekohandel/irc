@@ -6,13 +6,14 @@
 #include "messages/build_digest.h"
 
 using std::unique_ptr;
+using std::shared_ptr;
 
 class abstract_builder {
 	public:
-		~abstract_builder();
-		abstract_builder *add_builder(abstract_builder *builder);
+		virtual ~abstract_builder() = default;
+		shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> builder);
 		virtual unique_ptr<abstract_message> build(build_digest digest) const;
 
 	private:
-		abstract_builder *next_builder = nullptr;
+		shared_ptr<abstract_builder> next_builder = nullptr;
 };

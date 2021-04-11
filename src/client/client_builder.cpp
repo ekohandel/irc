@@ -6,18 +6,21 @@
 #include "messages/user_builder.h"
 #include "handlers/ping_handler.h"
 
-client *client_builder::build(string host, string service)
-{
-    client *c = new client(host, service);
+using std::make_unique;
+using std::make_shared;
 
-    (c->add_builder(new pass_builder()))
-        ->add_builder(new nick_builder())
-        ->add_builder(new user_builder())
-        ->add_builder(new ping_builder())
-        ->add_builder(new pong_builder())
+unique_ptr<client> client_builder::build(string host, string service)
+{
+    auto c = make_unique<client>(host, service);
+
+    (c->add_builder(make_shared<pass_builder>()))
+        ->add_builder(make_shared<nick_builder>())
+        ->add_builder(make_shared<user_builder>())
+        ->add_builder(make_shared<ping_builder>())
+        ->add_builder(make_shared<pong_builder>())
     ;
 
-    (c->add_handler(new ping_handler()))
+    (c->add_handler(make_shared<ping_handler>()))
     ;
 
     return c;

@@ -9,13 +9,11 @@ client::client(string host, string service)
 
 client::~client()
 {
-    delete message_builder;
-    delete message_handler;
     if (runner)
         runner->join();
 }
 
-abstract_handler *client::add_handler(abstract_handler *delegate)
+shared_ptr<abstract_handler> client::add_handler(shared_ptr<abstract_handler> delegate)
 {
     if (message_handler)
         return message_handler->add_handler(delegate);
@@ -23,7 +21,7 @@ abstract_handler *client::add_handler(abstract_handler *delegate)
     return message_handler;
 }
 
-abstract_builder *client::add_builder(abstract_builder *delegate)
+shared_ptr<abstract_builder> client::add_builder(shared_ptr<abstract_builder> delegate)
 {
     if (message_builder)
         return message_builder->add_builder(delegate);
