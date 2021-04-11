@@ -5,15 +5,11 @@
 #include "messages/abstract_builder.h"
 
 using std::unique_ptr;
+using std::shared_ptr;
 using std::vector;
 using std::string;
 
-abstract_builder::~abstract_builder()
-{
-	delete next_builder;
-}
-
-abstract_builder *abstract_builder::add_builder(abstract_builder *builder)
+shared_ptr<abstract_builder> abstract_builder::add_builder(shared_ptr<abstract_builder> builder)
 {
 	if (next_builder)
 		return next_builder->add_builder(builder);

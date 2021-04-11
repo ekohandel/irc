@@ -8,23 +8,20 @@
 
 using std::unique_ptr;
 using std::make_unique;
+using std::make_shared;
 
 class MessageTest: public ::testing::Test
 {
     public:
-        abstract_builder *handler;
+        shared_ptr<abstract_builder> handler;
 
         void SetUp() override {
-            (handler = new pass_builder())
-                ->add_builder(new nick_builder())
-                ->add_builder(new user_builder())
-                ->add_builder(new ping_builder())
-                ->add_builder(new pong_builder())
+            (handler = make_shared<pass_builder>())
+                ->add_builder(make_shared<nick_builder>())
+                ->add_builder(make_shared<user_builder>())
+                ->add_builder(make_shared<ping_builder>())
+                ->add_builder(make_shared<pong_builder>())
             ;
-        }
-
-        void TearDown() override {
-            delete handler;
         }
 };
 

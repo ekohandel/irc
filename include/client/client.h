@@ -23,8 +23,8 @@ class client
     public:
         client(string host, string service);
         ~client();
-        abstract_handler *add_handler(abstract_handler *delegate);
-        abstract_builder *add_builder(abstract_builder *delegate);
+        shared_ptr<abstract_handler> add_handler(shared_ptr<abstract_handler> delegate);
+        shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> delegate);
         void connect(string user_name, string real_name);
         void disconnect();
 
@@ -39,8 +39,8 @@ class client
         deque<string> write_messages;
         boost::asio::streambuf read_buffer;
         const char *message_delimiter = "\r\n";
-        abstract_builder *message_builder = nullptr;
-        abstract_handler *message_handler = nullptr;
+        shared_ptr<abstract_builder> message_builder = nullptr;
+        shared_ptr<abstract_handler> message_handler = nullptr;
 
         void start_runner();
         void do_read();

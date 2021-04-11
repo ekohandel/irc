@@ -1,12 +1,14 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "client/client.h"
 
 using std::string;
+using std::unique_ptr;
 
 class client_builder {
     public:
-        static client *build(string host, string service);
+        static unique_ptr<client> build(string host, string service);
 };

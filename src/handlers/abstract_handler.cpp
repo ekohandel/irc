@@ -2,12 +2,7 @@
 
 #include "handlers/abstract_handler.h"
 
-abstract_handler::~abstract_handler()
-{
-    delete next_handler;
-}
-
-abstract_handler *abstract_handler::add_handler(abstract_handler *handler)
+shared_ptr<abstract_handler> abstract_handler::add_handler(shared_ptr<abstract_handler> handler)
 {
     if (next_handler)
         return next_handler->add_handler(handler);
