@@ -4,5 +4,5 @@
 
 class ping_handler : public abstract_handler {
     public:
-        virtual abstract_message *handle(abstract_message *message) const override;
+        virtual shared_ptr<abstract_message> handle(shared_ptr<abstract_message> message) const override;
 };

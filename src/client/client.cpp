@@ -1,6 +1,7 @@
 #include "client/client.h"
 
 using std::make_unique;
+using std::make_shared;
 
 client::client(string host, string service)
     : host(host), service(service)
@@ -47,12 +48,9 @@ void client::connect(string user_name, string real_name)
                 socket->close();
             else {
                 do_read();
-                abstract_message *msg = new pass("password");
-                send_message(msg);
-                msg = new nick(user_name);
-                send_message(msg);
-                msg = new user(user_name, real_name);
-                send_message(msg);
+                send_message(make_shared<pass>("password"));
+                send_message(make_shared<nick>(user_name));
+                send_message(make_shared<user>(user_name, real_name));
             }
         }
     );
@@ -90,8 +88,8 @@ void client::do_read()
                 do_read();
 
                 try {
-                    unique_ptr<abstract_message> msg = message_builder->build(string{text.begin(), text.end() - strlen(message_delimiter)});
-                    abstract_message *reply = message_handler->handle(msg.get());
+                    shared_ptr<abstract_message> message = message_builder->build(string{text.begin(), text.end() - strlen(message_delimiter)});
+                    auto reply = message_handler->handle(message);
                     if (reply)
                         send_message(reply);
                 } catch (std::invalid_argument e) {
@@ -121,10 +119,10 @@ void client::do_write()
         }
     );
 }
-void client::send_message(abstract_message *msg)
+
+void client::send_message(shared_ptr<abstract_message> message)
 {
-    auto text = msg->serialize().append(message_delimiter);
-    delete msg;
+    auto text = message->serialize().append(message_delimiter);
     auto initiate_write = write_messages.empty();
     write_messages.push_back(text);
     if (initiate_write)
