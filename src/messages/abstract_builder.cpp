@@ -24,5 +24,5 @@ unique_ptr<abstract_message> abstract_builder::build(build_digest digest) const
 	if (next_builder)
 		return next_builder->build(digest);
 
-	throw std::invalid_argument("Unsupported message type: " + digest.command);
+	throw std::invalid_argument("Unsupported message: " + digest.text);
 }

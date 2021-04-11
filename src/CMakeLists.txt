@@ -19,6 +19,8 @@ add_library(irc
     ${CMAKE_CURRENT_LIST_DIR}/messages/pong.cpp
     ${CMAKE_CURRENT_LIST_DIR}/messages/user_builder.cpp
     ${CMAKE_CURRENT_LIST_DIR}/messages/user.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/messages/notice_builder.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/messages/notice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/handlers/abstract_handler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/handlers/ping_handler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/client/client_builder.cpp
