@@ -45,5 +45,5 @@ class client
         void start_runner();
         void do_read();
         void do_write();
-        void send_message(abstract_message *msg);
+        void send_message(shared_ptr<abstract_message> message);
 };

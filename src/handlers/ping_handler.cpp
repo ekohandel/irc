@@ -1,12 +1,16 @@
+#include <memory>
+
 #include "handlers/ping_handler.h"
 #include "messages/pong.h"
 #include "messages/ping.h"
 
-abstract_message *ping_handler::handle(abstract_message *message) const
+using std::make_shared;
+
+shared_ptr<abstract_message> ping_handler::handle(shared_ptr<abstract_message> message) const
 {
     if (message->get_command() != ping::command)
         return abstract_handler::handle(message);
 
-    ping *ping_message = static_cast<ping*>(message);
-    return new pong(ping_message->servers);
+    auto ping_message = std::static_pointer_cast<ping>(message);
+    return make_shared<pong>(ping_message->servers);
 }

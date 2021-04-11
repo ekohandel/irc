@@ -12,7 +12,7 @@ shared_ptr<abstract_handler> abstract_handler::add_handler(shared_ptr<abstract_h
     return handler;
 }
 
-abstract_message *abstract_handler::handle(abstract_message *message) const
+shared_ptr<abstract_message> abstract_handler::handle(shared_ptr<abstract_message> message) const
 {
     if (next_handler)
         return next_handler->handle(message);
