@@ -5,7 +5,7 @@ TEST(ClientTest, ShouldParseCommandWhenGivenMessageWithoutPrefixAndParameters)
 {
     auto c = client_builder::build("irc-server", "6667");
 
-    c->connect("homer", "Homer Simpson");
+    c->connect("homer", "password", "Homer Simpson");
 
     sleep(10);
 

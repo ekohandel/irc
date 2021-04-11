@@ -10,7 +10,6 @@ using std::shared_ptr;
 
 class abstract_builder {
 	public:
-		virtual ~abstract_builder() = default;
 		shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> builder);
 		virtual unique_ptr<abstract_message> build(build_digest digest) const;
 
