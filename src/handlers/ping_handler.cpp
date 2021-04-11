@@ -6,7 +6,7 @@
 
 using std::make_shared;
 
-shared_ptr<abstract_message> ping_handler::handle(shared_ptr<abstract_message> message) const
+shared_ptr<abstract_message> ping_handler::handle(shared_ptr<abstract_message> message)
 {
     if (message->get_command() != ping::command)
         return abstract_handler::handle(message);

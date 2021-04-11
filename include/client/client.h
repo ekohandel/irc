@@ -25,7 +25,7 @@ class client
         ~client();
         shared_ptr<abstract_handler> add_handler(shared_ptr<abstract_handler> delegate);
         shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> delegate);
-        void connect(string user_name, string real_name);
+        void connect(string nick_name, string password, string real_name);
         void disconnect();
 
     private:
@@ -34,7 +34,7 @@ class client
         unique_ptr<tcp::socket> socket;
         string host;
         string service;
-        string user_name;
+        string nick_name;
         string real_name;
         deque<string> write_messages;
         boost::asio::streambuf read_buffer;
