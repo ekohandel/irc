@@ -1,7 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "message.h"
-#include "messages.h"
+#include "messages/nick_builder.h"
+#include "messages/pass_builder.h"
+#include "messages/ping_builder.h"
+#include "messages/pong_builder.h"
+#include "messages/user_builder.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -9,15 +12,14 @@ using std::make_unique;
 class MessageTest: public ::testing::Test
 {
     public:
-        builder *handler;
+        abstract_builder *handler;
 
         void SetUp() override {
-            (handler = new template_builder<pass>())
-                ->add_builder(new template_builder<nick>())
-                ->add_builder(new template_builder<user>())
-                ->add_builder(new template_builder<ping>())
-                ->add_builder(new template_builder<pong>())
-                ->add_builder(new template_builder<notice>())
+            (handler = new pass_builder())
+                ->add_builder(new nick_builder())
+                ->add_builder(new user_builder())
+                ->add_builder(new ping_builder())
+                ->add_builder(new pong_builder())
             ;
         }
 
@@ -34,7 +36,7 @@ TEST_F(MessageTest, UnsupportedMessageFails)
     try {
         handler->build(text);
     } catch (std::invalid_argument e) {
-        EXPECT_EQ(e.what(), "Unsupported message type: " + text);
+        EXPECT_EQ(e.what(), string{"Unsupported message type: FOO"});
         thrown = true;
     }
     EXPECT_TRUE(thrown);
