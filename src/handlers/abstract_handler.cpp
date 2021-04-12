@@ -18,4 +18,8 @@ shared_ptr<abstract_message> abstract_handler::handle(shared_ptr<abstract_messag
         return next_handler->handle(message);
 
     throw std::invalid_argument("No handler found: " + message->serialize());
-};
+}
+
+void abstract_handler::wait()
+{
+}
