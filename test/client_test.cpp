@@ -1,13 +1,16 @@
 #include "gtest/gtest.h"
-#include "client/client_builder.h"
+#include "client/client.h"
 
 TEST(ClientTest, ShouldParseCommandWhenGivenMessageWithoutPrefixAndParameters)
 {
-    auto c = client_builder::build("irc-server", "6667");
+    auto c = client("irc-server", "6667");
 
-    c->connect("homer", "password", "Homer Simpson");
+    c.connect("homer", "password", "Homer Simpson");
 
-    sleep(10);
+    auto chans = c.get_channels();
+    std::cout << "Channels: " << std::endl;
+    for (auto chan : chans)
+        std::cout << chan << std::endl;
 
-    c->disconnect();
+    c.disconnect();
 }

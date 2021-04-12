@@ -27,6 +27,7 @@ class client
         shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> delegate);
         void connect(string nick_name, string password, string real_name);
         void disconnect();
+        vector<string> get_channels();
 
     private:
         io_context executer;
@@ -41,6 +42,8 @@ class client
         const char *message_delimiter = "\r\n";
         shared_ptr<abstract_builder> message_builder = nullptr;
         shared_ptr<abstract_handler> message_handler = nullptr;
+        shared_ptr<abstract_handler> registration_handler_ = nullptr;
+        shared_ptr<abstract_handler> list_handler_ = nullptr;
 
         void start_runner();
         void do_read();
