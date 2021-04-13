@@ -51,14 +51,14 @@ client::client(string host, string service)
         ->add_builder(make_shared<list_channel_end_builder>())
     ;
 
-    registration_handler_ = make_shared<registration_handler>();
-    list_handler_ = make_shared<list_handler>();
+    concrete_registration_handler = make_shared<registration_handler>();
+    concrete_list_handler = make_shared<list_handler>();
 
     add_handler(make_shared<ping_handler>())
         ->add_handler(make_shared<motd_handler>())
         ->add_handler(make_shared<notice_handler>())
-        ->add_handler(registration_handler_)
-        ->add_handler(list_handler_)
+        ->add_handler(concrete_registration_handler)
+        ->add_handler(concrete_list_handler)
     ;
 }
 
@@ -70,18 +70,18 @@ client::~client()
 
 shared_ptr<abstract_handler> client::add_handler(shared_ptr<abstract_handler> delegate)
 {
-    if (message_handler)
-        return message_handler->add_handler(delegate);
-    message_handler = delegate;
-    return message_handler;
+    if (root_message_handler)
+        return root_message_handler->add_handler(delegate);
+    root_message_handler = delegate;
+    return root_message_handler;
 }
 
 shared_ptr<abstract_builder> client::add_builder(shared_ptr<abstract_builder> delegate)
 {
-    if (message_builder)
-        return message_builder->add_builder(delegate);
-    message_builder = delegate;
-    return message_builder;
+    if (root_message_builder)
+        return root_message_builder->add_builder(delegate);
+    root_message_builder = delegate;
+    return root_message_builder;
 }
 
 void client::connect(string nick_name, string password, string real_name)
@@ -104,7 +104,7 @@ void client::connect(string nick_name, string password, string real_name)
     send_message(make_shared<nick>(nick_name));
     send_message(make_shared<user>(nick_name, real_name));
 
-    registration_handler_->wait();
+    concrete_registration_handler->wait();
 }
 
 void client::disconnect()
@@ -115,11 +115,15 @@ void client::disconnect()
 
 vector<string> client::get_channels()
 {
-    send_message(make_shared<list>(""));
+    auto handler = static_pointer_cast<list_handler>(concrete_list_handler);
 
-    list_handler_->wait();
+    handler->channels = {};
 
-    return static_pointer_cast<list_handler>(list_handler_)->channels;
+    send_message(make_shared<list>());
+
+    handler->wait();
+
+    return handler->channels;
 }
 
 void client::start_runner()
@@ -150,8 +154,8 @@ void client::do_read()
 
                     BOOST_LOG_TRIVIAL(trace) << string{"Received: "} + s;
 
-                    shared_ptr<abstract_message> message = message_builder->build(s);
-                    auto reply = message_handler->handle(message);
+                    shared_ptr<abstract_message> message = root_message_builder->build(s);
+                    auto reply = root_message_handler->handle(message);
                     if (reply)
                         send_message(reply);
                 } catch (std::invalid_argument e) {

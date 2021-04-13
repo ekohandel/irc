@@ -40,10 +40,10 @@ class client
         deque<string> write_messages;
         boost::asio::streambuf read_buffer;
         const char *message_delimiter = "\r\n";
-        shared_ptr<abstract_builder> message_builder = nullptr;
-        shared_ptr<abstract_handler> message_handler = nullptr;
-        shared_ptr<abstract_handler> registration_handler_ = nullptr;
-        shared_ptr<abstract_handler> list_handler_ = nullptr;
+        shared_ptr<abstract_builder> root_message_builder = nullptr;
+        shared_ptr<abstract_handler> root_message_handler = nullptr;
+        shared_ptr<abstract_handler> concrete_registration_handler = nullptr;
+        shared_ptr<abstract_handler> concrete_list_handler = nullptr;
 
         void start_runner();
         void do_read();
