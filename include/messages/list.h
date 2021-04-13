@@ -15,7 +15,7 @@ class list : public abstract_message {
 		vector<string> channels;
 		string target;
 
-		list(string prefix, vector<string> channels={}, string target={});
+		list(string prefix={}, vector<string> channels={}, string target={});
 		string serialize() const override;
 		string get_command() const override;
 };

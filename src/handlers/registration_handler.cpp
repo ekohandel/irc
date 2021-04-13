@@ -7,33 +7,27 @@
 #include "messages/created.h"
 #include "messages/myinfo.h"
 
-registration_handler::registration_handler()
-{
-    welcome_mutex.lock();
-    created_mutex.lock();
-    myinfo_mutex.lock();
-    yourhost_mutex.lock();
-}
+using boost::interprocess::microsec_clock;
 
 shared_ptr<abstract_message> registration_handler::handle(shared_ptr<abstract_message> message)
 {
     if (message->get_command() == welcome::command) {
-        welcome_mutex.unlock();
+        sem.post();
         return nullptr;
     }
 
     if (message->get_command() == created::command) {
-        created_mutex.unlock();
+        sem.post();
         return nullptr;
     }
 
     if (message->get_command() == myinfo::command) {
-        myinfo_mutex.unlock();
+        sem.post();
         return nullptr;
     }
 
     if (message->get_command() == yourhost::command) {
-        yourhost_mutex.unlock();
+        sem.post();
         return nullptr;
     }
 
@@ -42,8 +36,10 @@ shared_ptr<abstract_message> registration_handler::handle(shared_ptr<abstract_me
 
 void registration_handler::wait()
 {
-    welcome_mutex.lock();
-    created_mutex.lock();
-    myinfo_mutex.lock();
-    yourhost_mutex.lock();
+    auto deadline = microsec_clock::universal_time() + wait_time;
+    for (auto i = 0 ; i < 4; i++) {
+        if (!sem.timed_wait(deadline)) {
+            return;
+        }
+    }
 }

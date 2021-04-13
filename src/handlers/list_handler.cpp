@@ -5,16 +5,12 @@
 #include "messages/list.h"
 
 using std::static_pointer_cast;
-
-list_handler::list_handler()
-{
-    list_mutex.lock();
-}
+using boost::interprocess::microsec_clock;
 
 shared_ptr<abstract_message> list_handler::handle(shared_ptr<abstract_message> message)
 {
     if (message->get_command() == list_channel_end::command) {
-        list_mutex.unlock();
+        sem.post();
         return nullptr;
     }
 
@@ -29,5 +25,6 @@ shared_ptr<abstract_message> list_handler::handle(shared_ptr<abstract_message> m
 
 void list_handler::wait()
 {
-    list_mutex.lock();
+    auto deadline = microsec_clock::universal_time() + wait_time;
+    sem.timed_wait(deadline);
 }

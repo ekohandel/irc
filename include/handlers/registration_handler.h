@@ -1,21 +1,17 @@
 #pragma once
 
-#include <mutex>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "handlers/abstract_handler.h"
 
-using std::mutex;
+using boost::interprocess::interprocess_semaphore;
 
 class registration_handler : public abstract_handler {
     private:
         string message_of_the_day;
-        mutex welcome_mutex;
-        mutex created_mutex;
-        mutex myinfo_mutex;
-        mutex yourhost_mutex;
+        interprocess_semaphore sem {0};
 
     public:
-        registration_handler();
         virtual shared_ptr<abstract_message> handle(shared_ptr<abstract_message> message) override;
         void wait() override;
 };
