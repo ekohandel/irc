@@ -2,31 +2,31 @@
 #include <memory>
 
 #include "handlers/registration_handler.h"
-#include "messages/welcome.h"
-#include "messages/yourhost.h"
-#include "messages/created.h"
-#include "messages/myinfo.h"
+#include "messages/replies/welcome_reply.h"
+#include "messages/replies/yourhost_reply.h"
+#include "messages/replies/created_reply.h"
+#include "messages/replies/myinfo_reply.h"
 
 using boost::interprocess::microsec_clock;
 
 shared_ptr<abstract_message> registration_handler::handle(shared_ptr<abstract_message> message)
 {
-    if (message->get_command() == welcome::command) {
+    if (message->get_command() == welcome_reply::command) {
         sem.post();
         return nullptr;
     }
 
-    if (message->get_command() == created::command) {
+    if (message->get_command() == created_reply::command) {
         sem.post();
         return nullptr;
     }
 
-    if (message->get_command() == myinfo::command) {
+    if (message->get_command() == myinfo_reply::command) {
         sem.post();
         return nullptr;
     }
 
-    if (message->get_command() == yourhost::command) {
+    if (message->get_command() == yourhost_reply::command) {
         sem.post();
         return nullptr;
     }

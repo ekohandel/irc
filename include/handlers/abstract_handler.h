@@ -5,15 +5,17 @@
 
 #include "messages/abstract_message.h"
 
-using std::shared_ptr;
+using namespace std;
 using boost::posix_time::seconds;
 
 class abstract_handler {
     public:
-        virtual ~abstract_handler() = default;
         shared_ptr<abstract_handler> add_handler(shared_ptr<abstract_handler> handler);
+
         virtual shared_ptr<abstract_message> handle(shared_ptr<abstract_message> message);
         virtual void wait();
+
+        virtual ~abstract_handler() = default;
 
     protected:
         seconds wait_time {10};

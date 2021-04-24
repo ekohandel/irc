@@ -5,11 +5,8 @@
 #include <deque>
 #include <iostream>
 
-#include "messages/abstract_builder.h"
+#include "builders/abstract_builder.h"
 #include "handlers/abstract_handler.h"
-#include "messages/pass.h"
-#include "messages/nick.h"
-#include "messages/user.h"
 
 using std::deque;
 using std::string;

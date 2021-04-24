@@ -2,29 +2,31 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-#include "messages/motd_builder.h"
-#include "messages/nick_builder.h"
-#include "messages/pass_builder.h"
-#include "messages/ping_builder.h"
-#include "messages/pong_builder.h"
-#include "messages/user_builder.h"
-#include "messages/notice_builder.h"
-#include "messages/welcome_builder.h"
-#include "messages/created_builder.h"
-#include "messages/myinfo_builder.h"
-#include "messages/yourhost_builder.h"
+#include "builders/commands/nick_command_builder.h"
+#include "builders/commands/pass_command_builder.h"
+#include "builders/commands/ping_command_builder.h"
+#include "builders/commands/pong_command_builder.h"
+#include "builders/commands/user_command_builder.h"
+#include "builders/commands/notice_command_builder.h"
+#include "builders/replies/welcome_reply_builder.h"
+#include "builders/replies/created_reply_builder.h"
+#include "builders/replies/myinfo_reply_builder.h"
+#include "builders/replies/yourhost_reply_builder.h"
+#include "builders/replies/list_reply_builder.h"
+#include "builders/replies/list_end_reply_builder.h"
 
 #include "handlers/ping_handler.h"
-#include "handlers/motd_handler.h"
 #include "handlers/notice_handler.h"
 #include "handlers/registration_handler.h"
 #include "handlers/list_handler.h"
 
 #include "client/client.h"
-#include "messages/list.h"
+#include "messages/commands/list_command.h"
+#include "messages/commands/pass_command.h"
+#include "messages/commands/nick_command.h"
+#include "messages/commands/user_command.h"
 
-using std::make_unique;
-using std::make_shared;
+using namespace std;
 
 client::client(string host, string service)
     : host(host), service(service)
@@ -34,28 +36,24 @@ client::client(string host, string service)
         boost::log::trivial::severity >= boost::log::trivial::trace
     );
 
-    add_builder(make_shared<pass_builder>())
-        ->add_builder(make_shared<nick_builder>())
-        ->add_builder(make_shared<user_builder>())
-        ->add_builder(make_shared<ping_builder>())
-        ->add_builder(make_shared<pong_builder>())
-        ->add_builder(make_shared<notice_builder>())
-        ->add_builder(make_shared<motd_start_builder>())
-        ->add_builder(make_shared<motd_builder>())
-        ->add_builder(make_shared<motd_end_builder>())
-        ->add_builder(make_shared<welcome_builder>())
-        ->add_builder(make_shared<created_builder>())
-        ->add_builder(make_shared<yourhost_builder>())
-        ->add_builder(make_shared<myinfo_builder>())
-        ->add_builder(make_shared<list_channel_builder>())
-        ->add_builder(make_shared<list_channel_end_builder>())
+    add_builder(make_shared<pass_command_builder>())
+        ->add_builder(make_shared<nick_command_builder>())
+        ->add_builder(make_shared<user_command_builder>())
+        ->add_builder(make_shared<ping_command_builder>())
+        ->add_builder(make_shared<pong_command_builder>())
+        ->add_builder(make_shared<notice_command_builder>())
+        ->add_builder(make_shared<welcome_reply_builder>())
+        ->add_builder(make_shared<created_reply_builder>())
+        ->add_builder(make_shared<yourhost_reply_builder>())
+        ->add_builder(make_shared<myinfo_reply_builder>())
+        ->add_builder(make_shared<list_reply_builder>())
+        ->add_builder(make_shared<list_end_reply_builder>())
     ;
 
     concrete_registration_handler = make_shared<registration_handler>();
     concrete_list_handler = make_shared<list_handler>();
 
     add_handler(make_shared<ping_handler>())
-        ->add_handler(make_shared<motd_handler>())
         ->add_handler(make_shared<notice_handler>())
         ->add_handler(concrete_registration_handler)
         ->add_handler(concrete_list_handler)
@@ -100,9 +98,9 @@ void client::connect(string nick_name, string password, string real_name)
     start_runner();
 
     if (!password.empty())
-        send_message(make_shared<pass>(password));
-    send_message(make_shared<nick>(nick_name));
-    send_message(make_shared<user>(nick_name, real_name));
+        send_message(make_shared<pass_command>(password));
+    send_message(make_shared<nick_command>(nick_name));
+    send_message(make_shared<user_command>(nick_name, real_name));
 
     concrete_registration_handler->wait();
 }
@@ -119,7 +117,7 @@ vector<string> client::get_channels()
 
     handler->channels = {};
 
-    send_message(make_shared<list>());
+    send_message(make_shared<list_command>());
 
     handler->wait();
 

@@ -1,10 +1,12 @@
 #include "gtest/gtest.h"
 
-#include "messages/nick_builder.h"
-#include "messages/pass_builder.h"
-#include "messages/ping_builder.h"
-#include "messages/pong_builder.h"
-#include "messages/user_builder.h"
+#include "builders/commands/nick_command_builder.h"
+#include "builders/commands/pass_command_builder.h"
+#include "builders/commands/ping_command_builder.h"
+#include "builders/commands/pong_command_builder.h"
+#include "builders/commands/user_command_builder.h"
+
+#include "messages/commands/pass_command.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -16,11 +18,11 @@ class MessageTest: public ::testing::Test
         shared_ptr<abstract_builder> handler;
 
         void SetUp() override {
-            (handler = make_shared<pass_builder>())
-                ->add_builder(make_shared<nick_builder>())
-                ->add_builder(make_shared<user_builder>())
-                ->add_builder(make_shared<ping_builder>())
-                ->add_builder(make_shared<pong_builder>())
+            (handler = make_shared<pass_command_builder>())
+                ->add_builder(make_shared<nick_command_builder>())
+                ->add_builder(make_shared<user_command_builder>())
+                ->add_builder(make_shared<ping_command_builder>())
+                ->add_builder(make_shared<pong_command_builder>())
             ;
         }
 };
@@ -75,7 +77,7 @@ TEST_F(MessageTest, PassMessageWithoutPrefix)
 
 TEST_F(MessageTest, PassMessageExplicit)
 {
-    auto msg = make_unique<pass>("password");
+    auto msg = make_unique<pass_command>("password");
     const string text = "PASS password";
     EXPECT_EQ(msg->serialize(), text);
 }

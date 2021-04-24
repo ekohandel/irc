@@ -1,19 +1,20 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "handlers/abstract_handler.h"
 
-using std::vector;
+using namespace std;
 using boost::interprocess::interprocess_semaphore;
 
 class list_handler : public abstract_handler {
-    private:
-        interprocess_semaphore sem {0};
-
     public:
         vector<string> channels;
 
-        virtual shared_ptr<abstract_message> handle(shared_ptr<abstract_message> message) override;
+        virtual std::shared_ptr<abstract_message> handle(std::shared_ptr<abstract_message> message) override;
         void wait() override;
+
+    private:
+        interprocess_semaphore sem {0};
 };
