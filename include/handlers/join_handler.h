@@ -7,7 +7,7 @@
 using namespace std;
 using boost::interprocess::interprocess_semaphore;
 
-class registration_handler : public abstract_handler {
+class join_handler : public abstract_handler {
     public:
         virtual shared_ptr<abstract_message> handle(shared_ptr<abstract_message> message) override;
         void wait() override;

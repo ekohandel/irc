@@ -13,7 +13,7 @@ string list_command::serialize() const
 {
     string serialized = abstract_message::serialize() + command;
 
-    serialized += join(channels, ",");
+    serialized += " " + join(channels, ",");
 
     if (target.size())
         serialized += " " + target;

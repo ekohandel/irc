@@ -2,6 +2,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
+#include "builders/commands/join_command_builder.h"
 #include "builders/commands/nick_command_builder.h"
 #include "builders/commands/pass_command_builder.h"
 #include "builders/commands/ping_command_builder.h"
@@ -37,6 +38,7 @@ client::client(string host, string service)
     );
 
     add_builder(make_shared<pass_command_builder>())
+        ->add_builder(make_shared<join_command_builder>())
         ->add_builder(make_shared<nick_command_builder>())
         ->add_builder(make_shared<user_command_builder>())
         ->add_builder(make_shared<ping_command_builder>())
@@ -64,22 +66,6 @@ client::~client()
 {
     if (runner)
         runner->join();
-}
-
-shared_ptr<abstract_handler> client::add_handler(shared_ptr<abstract_handler> delegate)
-{
-    if (root_message_handler)
-        return root_message_handler->add_handler(delegate);
-    root_message_handler = delegate;
-    return root_message_handler;
-}
-
-shared_ptr<abstract_builder> client::add_builder(shared_ptr<abstract_builder> delegate)
-{
-    if (root_message_builder)
-        return root_message_builder->add_builder(delegate);
-    root_message_builder = delegate;
-    return root_message_builder;
 }
 
 void client::connect(string nick_name, string password, string real_name)
@@ -111,7 +97,7 @@ void client::disconnect()
     socket->close();
 }
 
-vector<string> client::get_channels()
+vector<channel> client::get_channels()
 {
     auto handler = static_pointer_cast<list_handler>(concrete_list_handler);
 
@@ -121,7 +107,11 @@ vector<string> client::get_channels()
 
     handler->wait();
 
-    return handler->channels;
+    vector<channel> channels;
+    for (auto c : handler->channels)
+        channels.push_back(channel(c, *this));
+
+    return channels;
 }
 
 void client::start_runner()
@@ -152,8 +142,8 @@ void client::do_read()
 
                     BOOST_LOG_TRIVIAL(trace) << string{"Received: "} + s;
 
-                    shared_ptr<abstract_message> message = root_message_builder->build(s);
-                    auto reply = root_message_handler->handle(message);
+                    shared_ptr<abstract_message> message = build(s);
+                    auto reply = handle(message);
                     if (reply)
                         send_message(reply);
                 } catch (std::invalid_argument e) {
