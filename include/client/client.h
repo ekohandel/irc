@@ -5,26 +5,26 @@
 #include <deque>
 #include <iostream>
 
-#include "builders/abstract_builder.h"
 #include "handlers/abstract_handler.h"
+#include "builders/abstract_builder.h"
+#include "client/abstract_client.h"
+#include "channel.h"
 
-using std::deque;
-using std::string;
-using std::unique_ptr;
+using namespace std;
 using boost::asio::io_context;
 using boost::asio::ip::tcp;
-using std::thread;
 
-class client
-{
+class client : public abstract_client {
     public:
         client(string host, string service);
-        ~client();
-        shared_ptr<abstract_handler> add_handler(shared_ptr<abstract_handler> delegate);
-        shared_ptr<abstract_builder> add_builder(shared_ptr<abstract_builder> delegate);
+
+        void send_message(shared_ptr<abstract_message> message) override;
+
         void connect(string nick_name, string password, string real_name);
         void disconnect();
-        vector<string> get_channels();
+        vector<channel> get_channels();
+
+        ~client();
 
     private:
         io_context executer;
@@ -37,13 +37,10 @@ class client
         deque<string> write_messages;
         boost::asio::streambuf read_buffer;
         const char *message_delimiter = "\r\n";
-        shared_ptr<abstract_builder> root_message_builder = nullptr;
-        shared_ptr<abstract_handler> root_message_handler = nullptr;
         shared_ptr<abstract_handler> concrete_registration_handler = nullptr;
         shared_ptr<abstract_handler> concrete_list_handler = nullptr;
 
         void start_runner();
         void do_read();
         void do_write();
-        void send_message(shared_ptr<abstract_message> message);
 };
